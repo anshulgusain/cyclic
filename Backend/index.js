@@ -1,6 +1,6 @@
 const express=require("express")
 
-const { connection } = require("mongoose")
+const { connection } = require("./connection/db")
 const { UserModel } = require("./models/Usermodel")
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
@@ -19,8 +19,8 @@ app.post("/signup",async(req,res)=>{
     const {name,email,password}=req.body;
    
  
-        // bcrypt.genSalt(3, function(err, salt) {
-            // bcrypt.hash(password, salt, async function(err, hash) {
+        bcrypt.genSalt(3, function(err, salt) {
+            bcrypt.hash(password, salt, async function(err, hash) {
         const newUser=new UserModel({
             email,
             password,
@@ -30,31 +30,31 @@ app.post("/signup",async(req,res)=>{
          await newUser.save()
          res.send("Signed Up")
         });
-    // });
+    });
     
-// })
+})
     
 
 
-// app.post("/login",async(req,res)=>{
-//     const{email,password}=req.body
-//    const user=await UserModel.findOne({email:email})
-//    if(user){
-//     const password=user.password
-//     bcrypt.compare("B4c0/\/", password, function(err, res) {
-//         // res === true
-//         if(res){
-//             const token = jwt.sign({userID:user._id }, 'shhhhh');
-//             res.send({msg:"Logged in succesfully",token: token})
-//         }
-//         else{
-//             res.send("Login failed")
-//         }
+app.post("/login",async(req,res)=>{
+    const{email,password}=req.body
+   const user=await UserModel.findOne({email:email})
+   if(user){
+    const password=user.password
+    bcrypt.compare("B4c0/\/", password, function(err, res) {
+        // res === true
+        if(res){
+            const token = jwt.sign({userID:user._id }, 'shhhhh');
+            res.send({msg:"Logged in succesfully",token: token})
+        }
+        else{
+            res.send("Login failed")
+        }
 
-//     });
-//    }
-//     res.send("This is Base Api")
-// })
+    });
+   }
+    res.send("This is Base Api")
+})
 
 app.use(authenticate)
 
